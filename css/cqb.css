@@ -6,7 +6,19 @@ body {
     background-color:#000000
 }
 
+a,a:link,a:visited,a:hover,a:active {
+    color:#1F2933;
+    text-decoration:  none;
+    font-weight:      bold;
+} 
+
 main {
+    position: relative;
+    left: 0px;
+    right: 0px;
+}
+
+screen_area {
     position: absolute;
     left: 0px;
     top: 0px;

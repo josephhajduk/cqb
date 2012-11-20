@@ -69,12 +69,12 @@
         $(window).load(function() {
             $(window).bind('resize',function(event){
                 window.scrollTo(0,0);
-                director.windowResized($(window).width(), $(window).height());
+                director.windowResized($(window).width() - 15, $(window).height() - 15);
                 
-                topOffset = ($(window).height() - $("#main").height())/2
-                leftOffset = ($(window).width() - $("#main").width())/2
+                topOffset = Math.floor(($(window).height() - $("#main").height())/2)
+                leftOffset = Math.floor(($(window).width() - $("#main").width())/2)
                 
-                $("#main").css({ 
+                $("#screen_area").css({ 
                     position: 'absolute',
                     top: topOffset,
                     left: leftOffset
