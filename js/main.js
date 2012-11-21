@@ -50,6 +50,82 @@ function race_scene(director) {
         .setBackgroundImage(car_yellow.getRef(),true)  
         .setSpriteIndex(12)
         .centerAt(280,180)
+    
+    var keys = [0,0,0,0];
+    
+    CAAT.registerKeyListener( function kl( keyEvent ) {
+    
+        if ( keyEvent.getKeyCode()===CAAT.Keys.UP ) {
+            keyEvent.preventDefault();
+            keys[2]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
+        }
+        if ( keyEvent.getKeyCode()===CAAT.Keys.DOWN ) {
+            keyEvent.preventDefault();
+            keys[3]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
+        }
+        if ( keyEvent.getKeyCode()===CAAT.Keys.LEFT ) {
+            keyEvent.preventDefault();
+            keys[0]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
+        }
+        if ( keyEvent.getKeyCode()===CAAT.Keys.RIGHT ) {
+            keyEvent.preventDefault();
+            keys[1]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
+        }
+    
+    });
+
+    var prevTime=           -1;
+    
+    var angle_index = [5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,1,10,2,3,4]
+    
+    scene.createTimer( scene.time, Number.MAX_VALUE, null,
+        function(time, ttime, timerTask) {
+    
+            var selected = red_car
+            
+            var pixelsPerSecond = 76
+    
+            var ottime= ttime;
+            if ( -1!=prevTime ) {
+                ttime-= prevTime;
+                
+                if (keys[1] - keys[0] != 0 || keys[3]-keys[2] != 0) {
+                    var dx = keys[1]-keys[0]
+                    var dy = keys[3]-keys[2]
+                    
+                    var ang = Math.atan2(dy,dx) * 180 / Math.PI
+                    
+                    var a2 = (((ang+9)%360)+360)%360
+                    
+                    var div_angle = Math.floor(a2/18)
+                    
+                    var index = angle_index[div_angle]
+                    
+                    console.log(Math.floor((ang-9)/18))
+                    console.log(index)
+                    selected.setSpriteIndex(index)
+                    
+                }
+    
+                selected.x += (ttime/1000)*pixelsPerSecond * (keys[1]-keys[0]);
+                selected.y += (ttime/1000)*pixelsPerSecond * (keys[3]-keys[2]);
+    
+                if ( selected.x > director.width-20 ) {
+                    selected.x= director.width-20;
+                } else if ( selected.x<-20 ) {
+                    selected.x= -20;
+                }
+                if ( selected.y > director.height-20 ) {
+                    selected.y= director.height-20;
+                } else if ( selected.y<-20 ) {
+                    selected.y= -20;
+                }
+            }
+            prevTime= ottime;
+        },
+        null
+    );
+        
         
     bg.addChild(actor_base);
     bg.addChild(blue_car);
