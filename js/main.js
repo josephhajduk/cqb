@@ -51,25 +51,36 @@ function race_scene(director) {
         .setSpriteIndex(12)
         .centerAt(280,180)
     
-    var keys = [0,0,0,0];
+    var v = 0
+    var theta = 0
     
     CAAT.registerKeyListener( function kl( keyEvent ) {
     
         if ( keyEvent.getKeyCode()===CAAT.Keys.UP ) {
             keyEvent.preventDefault();
-            keys[2]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
+            
+            v += 10
+            
+            //keys[2]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
         }
         if ( keyEvent.getKeyCode()===CAAT.Keys.DOWN ) {
             keyEvent.preventDefault();
-            keys[3]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
+            
+            v -= 10
+            //keys[3]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
         }
         if ( keyEvent.getKeyCode()===CAAT.Keys.LEFT ) {
             keyEvent.preventDefault();
-            keys[0]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
+            
+            theta -= 9
+            
+            //keys[0]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
         }
         if ( keyEvent.getKeyCode()===CAAT.Keys.RIGHT ) {
             keyEvent.preventDefault();
-            keys[1]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
+            
+            theta += 9
+            //keys[1]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
         }
     
     });
@@ -89,26 +100,26 @@ function race_scene(director) {
             if ( -1!=prevTime ) {
                 ttime-= prevTime;
                 
-                if (keys[1] - keys[0] != 0 || keys[3]-keys[2] != 0) {
-                    var dx = keys[1]-keys[0]
-                    var dy = keys[3]-keys[2]
-                    
-                    var ang = Math.atan2(dy,dx) * 180 / Math.PI
-                    
-                    var a2 = (((ang+9)%360)+360)%360
-                    
-                    var div_angle = Math.floor(a2/18)
-                    
-                    var index = angle_index[div_angle]
-                    
-                    console.log(Math.floor((ang-9)/18))
-                    console.log(index)
-                    selected.setSpriteIndex(index)
-                    
-                }
+                var vX = v * Math.cos(theta * Math.PI / 180)
+                var vY = v * Math.sin(theta * Math.PI / 180)
+                
+                var dx = (ttime/1000)*(vX)
+                var dy = (ttime/1000)*(vY)
+                
+                var ang = theta
+                
+                var a2 = (((ang+9)%360)+360)%360
+                
+                var div_angle = Math.floor(a2/18)
+                
+                var index = angle_index[div_angle]
+                
+                console.log(Math.floor((ang-9)/18))
+                console.log(index)
+                selected.setSpriteIndex(index)
     
-                selected.x += (ttime/1000)*pixelsPerSecond * (keys[1]-keys[0]);
-                selected.y += (ttime/1000)*pixelsPerSecond * (keys[3]-keys[2]);
+                selected.x += dx
+                selected.y += dy
     
                 if ( selected.x > director.width-20 ) {
                     selected.x= director.width-20;
@@ -131,7 +142,7 @@ function race_scene(director) {
     bg.addChild(blue_car);
     bg.addChild(red_car);
     bg.addChild(yellow_car);
-    bg.addChild(actor_shadows);
+    //bg.addChild(actor_shadows);
     bg.addChild(actor_above);    
 
 }
