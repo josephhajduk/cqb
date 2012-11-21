@@ -1,4 +1,5 @@
 
+
 function race_scene(director) {
     var scene = director.createScene();
     
@@ -7,7 +8,6 @@ function race_scene(director) {
         .setFillStyle('#000')
         
     scene.addChild(bg);
-    
     var map_name = "thecity"
     
     var base = new CAAT.SpriteImage()
@@ -51,8 +51,10 @@ function race_scene(director) {
         .setSpriteIndex(12)
         .centerAt(280,180)
     
-    var v = 0
+    var v = 25
     var theta = 0
+    
+    CAAT.enableDeviceMotion();
     
     CAAT.registerKeyListener( function kl( keyEvent ) {
     
@@ -85,12 +87,33 @@ function race_scene(director) {
     
     });
 
-    var prevTime=           -1;
+    var prevTime= -1;
+    
+    scene.onRenderEnd = function(director, time) { 
+                var ax = CAAT.rotationRate.alpha;
+                if (Math.abs(ax) < 1)
+                    ax =0
+                
+                var rx = CAAT.rotationRate.gamma;
+                if (Math.abs(rx) < 1)
+                    rx =0
+                
+                var bx = CAAT.rotationRate.beta;
+                if (Math.abs(bx) < 1)
+                    bx = 0
+                
+                theta += rx/5
+                v += bx/10
+                
+                v = Math.min(v,50)
+                v = Math.max(v,0)
+            };
     
     var angle_index = [5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,1,10,2,3,4]
     
     scene.createTimer( scene.time, Number.MAX_VALUE, null,
         function(time, ttime, timerTask) {
+    
     
             var selected = red_car
             
@@ -210,7 +233,15 @@ function opening_scene(director) {
             new CAAT.AlphaBehavior()
                 .setFrameTime(scene.time+2000,2000)
                 .setValues(0,1)
-        );
+        )
+        
+    actorSplash.mouseClick = function(e) {
+                director.switchToNextScene(
+                        2000,
+                        true,
+                        true
+                )
+            }
             
     bg.addChild(actorBad)
     bg.addChild(actorLands)
@@ -275,7 +306,7 @@ function __init(cocoonjs)   {
         function( counter, images ) {
             if(counter === images.length) {
                 director.setImagesCache(images);
-                //opening_scene(director);
+                opening_scene(director);
                 race_scene(director);
                 CAAT.loop(60);
             }
