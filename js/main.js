@@ -1,5 +1,66 @@
 
-function __scene(director) {
+function race_scene(director) {
+    var scene = director.createScene();
+    
+    var bg = new CAAT.ActorContainer()
+        .setBounds(0,0,director.width,director.height)
+        .setFillStyle('#000')
+        
+    scene.addChild(bg);
+    
+    var map_name = "thecity"
+    
+    var base = new CAAT.SpriteImage()
+        .initialize(director.getImage(map_name+"_base"),1,1)
+    
+    var shadows = new CAAT.SpriteImage()
+        .initialize(director.getImage(map_name+"_shadows"),1,1)
+        
+    var above = new CAAT.SpriteImage()
+        .initialize(director.getImage(map_name+"_above"),1,1)
+        
+    var car_blue = new CAAT.SpriteImage()
+        .initialize(director.getImage("car_blue"),1,20)
+    var car_yellow = new CAAT.SpriteImage()
+        .initialize(director.getImage("car_yellow"),1,20)
+    var car_red = new CAAT.SpriteImage()
+        .initialize(director.getImage("car_red"),1,20)
+        
+    var actor_base = new CAAT.Actor()
+        .setBackgroundImage(base.getRef(),true)
+          
+    var actor_shadows = new CAAT.Actor()
+        .setBackgroundImage(shadows.getRef(),true)  
+        .setAlpha(.6)
+        
+    var actor_above = new CAAT.Actor()
+        .setBackgroundImage(above.getRef(),true)    
+        
+    var blue_car = new CAAT.Actor()
+        .setBackgroundImage(car_blue.getRef(),true)  
+        .setSpriteIndex(5)
+        .centerAt(85,50)
+        
+    var red_car = new CAAT.Actor()
+        .setBackgroundImage(car_red.getRef(),true)  
+        .setSpriteIndex(1)
+        .centerAt(60,120)
+        
+    var yellow_car = new CAAT.Actor()
+        .setBackgroundImage(car_yellow.getRef(),true)  
+        .setSpriteIndex(12)
+        .centerAt(280,180)
+        
+    bg.addChild(actor_base);
+    bg.addChild(blue_car);
+    bg.addChild(red_car);
+    bg.addChild(yellow_car);
+    bg.addChild(actor_shadows);
+    bg.addChild(actor_above);    
+
+}
+
+function opening_scene(director) {
 
     var scene= director.createScene();
 
@@ -113,15 +174,22 @@ function __init(cocoonjs)   {
 
     new CAAT.ImagePreloader().loadImages(
         [   
-            {id:'splash_bad',    url:'img/bad.png'},
-            {id:'splash_lands',    url:'img/lands.png'},
-            {id:'splash_car',    url:'img/car.png'},
+            {id:'splash_bad',       url:'img/bad.png'},
+            {id:'splash_lands',     url:'img/lands.png'},
+            {id:'splash_car',       url:'img/car.png'},
             {id:'splash_splash',    url:'img/splash.png'},
+            {id:'thecity_base',     url:'img/thecity/base.png'},
+            {id:'thecity_shadows',  url:'img/thecity/shadows.png'},
+            {id:'thecity_above',    url:'img/thecity/above.png'},
+            {id:'car_blue',         url:'img/car/car_blue.png'}, 
+            {id:'car_yellow',         url:'img/car/car_yellow.png'}, 
+            {id:'car_red',         url:'img/car/car_red.png'}, 
         ],
         function( counter, images ) {
             if(counter === images.length) {
                 director.setImagesCache(images);
-                __scene(director);
+                //opening_scene(director);
+                race_scene(director);
                 CAAT.loop(60);
             }
         }
