@@ -1,7 +1,7 @@
 
-
 function race_scene(director) {
     var scene = director.createScene();
+    var hash= new CAAT.SpatialHash().initialize( director.width, director.height, 10, 16 );
     
     var bg = new CAAT.ActorContainer()
         .setBounds(0,0,director.width,director.height)
@@ -44,7 +44,7 @@ function race_scene(director) {
     var red_car = new CAAT.Actor()
         .setBackgroundImage(car_red.getRef(),true)  
         .setSpriteIndex(1)
-        .centerAt(60,120)
+        .centerAt(120,40)
         
     var yellow_car = new CAAT.Actor()
         .setBackgroundImage(car_yellow.getRef(),true)  
@@ -54,41 +54,190 @@ function race_scene(director) {
     var v = 25
     var theta = 0
     
-    CAAT.enableDeviceMotion();
+    var walls = [
+        [0,0,10,209],
+        [10,0,2,122],
+        [12,0,2,92],
+        [14,0,2,75],
+        [16,0,2,60],
+        [18,0,2,40],
+        [20,0,2,25],
+        [22,0,2,22],
+        [24,0,2,19],
+        [26,0,4,16],
+        [30,0,4,13],
+        [34,0,5,10],
+        [39,0,4,8],
+        [43,0,4,6],
+        [47,0,233,5],
+        [280,0,10,7],
+        [290,0,5,10],
+        [295,0,5,12],
+        [300,0,5,16],
+        [305,0,5,20],
+        [310,0,2,25],
+        [312,0,2,40],
+        [314,0,2,60],
+        [316,0,2,80],
+        [318,0,2,100],
+        [320,0,2,109],
+        [322,0,2,129],
+        [324,0,2,149],
+        [10,180,2,29],
+        [12,190,2,19],
+        [14,195,2,14],
+        [16,197,2,12],
+        [18,200,2,9],
+        [20,202,2,7],
+        [22,204,2,5],
+        [24,206,5,3],
+        [29,207,5,2],
+        [32,208,5,1],
+        [122,207,8,2],
+        [130,205,5,4],
+        [135,202,5,7],
+        [140,199,3,10],
+        [143,197,2,12],
+        [145,193,2,16],
+        [147,190,2,19],
+        [149,186,3,23],
+        [151,123,2,86],
+        [149,122,2,38],
+        [147,122,2,18],
+        [153,125,4,18],
+        [157,129,4,18],
+        [161,133,4,18],
+        [165,138,4,18],
+        [169,141,4,18],
+        [173,144,4,18],
+        [177,149,4,18],
+        [181,153,4,18],
+        [185,157,4,18],
+        [189,161,4,18],
+        [193,165,4,18],
+        [197,169,4,18],
+        [201,172,4,18],
+        [205,176,4,18],
+        [209,179,4,18],
+        [213,183,4,18],
+        [217,186,4,18],
+        [220,189,4,18],
+        [223,192,4,18],
+        [226,195,4,18],
+        [229,197,4,18],
+        [232,202,4,18],
+        [235,206,4,18],
+        [165,65,4,8],
+        [169,65,4,10],
+        [173,65,4,12],
+        [177,65,4,15],
+        [181,65,4,18],
+        [185,65,4,22],
+        [189,65,4,26],
+        [193,67,4,29],
+        [197,69,4,31],
+        [201,72,4,32],
+        [205,75,4,32],
+        [209,78,4,33],
+        [213,80,4,35],
+        [217,83,4,36],
+        [221,85,4,38],
+        [225,88,4,39],
+        [229,92,4,38],
+        [233,95,4,39],
+        [237,100,4,39],
+        [241,103,4,40],
+        [245,107,2,39],
+        [247,109,2,39],
+        [249,115,2,35],
+        [251,118,2,34],
+        [253,120,2,33],
+        [255,126,2,30],
+        [257,132,2,24],
+        [259,138,2,16],
+        [296,206,10,3],
+        [306,203,10,10],
+        [316,198,5,15],
+        [321,189,5,20],
+        [326,0,10,220],
+        [0,209,336,5],
+        [84,64,81,8],
+        [77,126,2,29],
+        [79,108,2,49],
+        [81,81,2,73],
+        [83,72,2,82],
+        [85,80,2,62],
+        [87,80,2,38],
+        [89,80,2,16],
+        [91,80,2,7],
+        [93,72,2,11],
+        [95,72,2,9],
+        [97,72,2,7],
+        [99,72,2,5],
+        [101,72,2,4],
+        [103,72,2,2],
+    ]
+    
+    var wall_actors = []
+    var wall_rects = []
+    
+    for(var i = 0; i < walls.length; i++) {
+        var twall = walls[i]
+    
+        var wallBlock = new CAAT.Actor()
+            .setPosition(twall[0],twall[1])
+            .setSize(twall[2],twall[3])
+            .setFillStyle("#ff10fc")  
+            .setAlpha(.5)
+            
+        wall_rects.push( { AABB : new CAAT.Rectangle().setBounds(twall[0],twall[1],twall[2],twall[3]) } );
+            
+        wall_actors.push(wallBlock)
+    }
+    
+    var wall_collision = new CAAT.Module.Collision.QuadTree().create( 0,0,336,240, wall_rects);
+    
+    //CAAT.enableDeviceMotion();
+    
+    var throtle = 0
+    var steer_left = 0
+    var steer_right = 0
     
     CAAT.registerKeyListener( function kl( keyEvent ) {
     
         if ( keyEvent.getKeyCode()===CAAT.Keys.UP ) {
             keyEvent.preventDefault();
             
-            v += 10
+            //v += 10
             
-            //keys[2]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
+            throtle = ( keyEvent.getAction()==='up' ) ? -1.5 : 1;
         }
-        if ( keyEvent.getKeyCode()===CAAT.Keys.DOWN ) {
+        /*if ( keyEvent.getKeyCode()===CAAT.Keys.DOWN ) {
             keyEvent.preventDefault();
             
-            v -= 10
-            //keys[3]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
-        }
+            throtle = ( keyEvent.getAction()==='up' ) ? 0 : 1;
+        }*/
         if ( keyEvent.getKeyCode()===CAAT.Keys.LEFT ) {
             keyEvent.preventDefault();
             
-            theta -= 9
+            //theta -= 9
+            
+            steer_left = ( keyEvent.getAction()==='up' ) ? 0 : 1;
             
             //keys[0]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
         }
         if ( keyEvent.getKeyCode()===CAAT.Keys.RIGHT ) {
             keyEvent.preventDefault();
             
-            theta += 9
+            steer_right = ( keyEvent.getAction()==='up' ) ? 0 : 1;
+            //theta += 9
             //keys[1]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
         }
     
     });
 
     var prevTime= -1;
-    
+    /*
     scene.onRenderEnd = function(director, time) { 
                 var ax = CAAT.rotationRate.alpha;
                 if (Math.abs(ax) < 1)
@@ -108,6 +257,13 @@ function race_scene(director) {
                 v = Math.min(v,50)
                 v = Math.max(v,0)
             };
+            */
+            
+            
+            
+    // COLLISION
+    
+    var r0 = new CAAT.Rectangle();
     
     var angle_index = [5,6,7,8,9,0,11,12,13,14,15,16,17,18,19,1,10,2,3,4]
     
@@ -123,6 +279,14 @@ function race_scene(director) {
             if ( -1!=prevTime ) {
                 ttime-= prevTime;
                 
+                v += throtle *1.5 //accel factor
+                
+                v = Math.min(v,90) // 75 is max speed
+                v = Math.max(v,0)
+                
+                theta += steer_right *2.5 - steer_left*2.5  // 1.1 is the steering factor
+                
+                
                 var vX = v * Math.cos(theta * Math.PI / 180)
                 var vY = v * Math.sin(theta * Math.PI / 180)
                 
@@ -137,12 +301,34 @@ function race_scene(director) {
                 
                 var index = angle_index[div_angle]
                 
-                console.log(Math.floor((ang-9)/18))
-                console.log(index)
+                //console.log(Math.floor((ang-9)/18))
+                //console.log(index)
                 selected.setSpriteIndex(index)
     
-                selected.x += dx
-                selected.y += dy
+                
+                // collision
+                hash.clearObject();
+                
+                var wall_colide = wall_collision.getOverlappingActors(
+                                    r0.setBounds( selected.x + selected.width/2 + dx - 4, selected.y + selected.height/2 - 4 +dy, 8 , 8 ) 
+                                    );
+                                    
+                if (wall_colide.length) {
+                    v = v*0.8;
+                    
+                    
+                    var dcX = 5 * Math.cos((theta+180) * Math.PI / 180)
+                    var dcY = 5 * Math.sin((theta+180) * Math.PI / 180)
+                    
+                    // TODO verify that the new position isn't in a collided state
+                    
+                    selected.x += dcX
+                    selected.y += dcY
+                    
+                } else {
+                    selected.x += dx
+                    selected.y += dy
+                }
     
                 if ( selected.x > director.width-20 ) {
                     selected.x= director.width-20;
@@ -167,6 +353,10 @@ function race_scene(director) {
     bg.addChild(yellow_car);
     //bg.addChild(actor_shadows);
     bg.addChild(actor_above);    
+    
+    for (var j = 0; j < wall_actors.length; j++) {
+        //bg.addChild(wall_actors[j]);
+    }
 
 }
 
@@ -306,7 +496,7 @@ function __init(cocoonjs)   {
         function( counter, images ) {
             if(counter === images.length) {
                 director.setImagesCache(images);
-                opening_scene(director);
+                //opening_scene(director);
                 race_scene(director);
                 CAAT.loop(60);
             }
