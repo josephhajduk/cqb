@@ -1,4 +1,3 @@
-
 function race_scene(director) {
     var scene = director.createScene();
     var hash= new CAAT.SpatialHash().initialize( director.width, director.height, 10, 16 );
@@ -207,31 +206,15 @@ function race_scene(director) {
     
         if ( keyEvent.getKeyCode()===CAAT.Keys.UP ) {
             keyEvent.preventDefault();
-            
-            //v += 10
-            
             throtle = ( keyEvent.getAction()==='up' ) ? -1.5 : 1;
         }
-        /*if ( keyEvent.getKeyCode()===CAAT.Keys.DOWN ) {
-            keyEvent.preventDefault();
-            
-            throtle = ( keyEvent.getAction()==='up' ) ? 0 : 1;
-        }*/
         if ( keyEvent.getKeyCode()===CAAT.Keys.LEFT ) {
             keyEvent.preventDefault();
-            
-            //theta -= 9
-            
             steer_left = ( keyEvent.getAction()==='up' ) ? 0 : 1;
-            
-            //keys[0]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
         }
         if ( keyEvent.getKeyCode()===CAAT.Keys.RIGHT ) {
             keyEvent.preventDefault();
-            
             steer_right = ( keyEvent.getAction()==='up' ) ? 0 : 1;
-            //theta += 9
-            //keys[1]= ( keyEvent.getAction()==='up' ) ? 0 : 1;
         }
     
     });
@@ -259,8 +242,6 @@ function race_scene(director) {
             };
             */
             
-            
-            
     // COLLISION
     
     var r0 = new CAAT.Rectangle();
@@ -269,78 +250,73 @@ function race_scene(director) {
     
     scene.createTimer( scene.time, Number.MAX_VALUE, null,
         function(time, ttime, timerTask) {
-    
-    
+        
             var selected = red_car
-            
-            var pixelsPerSecond = 76
     
             var ottime= ttime;
             if ( -1!=prevTime ) {
                 ttime-= prevTime;
                 
+                ///
+                ///  Throttle Control
+                ///
                 v += throtle *1.5 //accel factor
-                
-                v = Math.min(v,90) // 75 is max speed
+                v = Math.min(v,150) // 75 is max speed
                 v = Math.max(v,0)
                 
-                theta += steer_right *2.5 - steer_left*2.5  // 1.1 is the steering factor
+                ///
+                /// Steering Control
+                ///
+                theta += steer_right*4.5 - steer_left*4.5  // 1.1 is the steering factor
                 
+                /// 
+                ///  Physics
+                ///           
+                var dx = (ttime/1000)* v * Math.cos(theta * Math.PI / 180)
+                var dy = (ttime/1000)* v * Math.sin(theta * Math.PI / 180)
                 
-                var vX = v * Math.cos(theta * Math.PI / 180)
-                var vY = v * Math.sin(theta * Math.PI / 180)
-                
-                var dx = (ttime/1000)*(vX)
-                var dy = (ttime/1000)*(vY)
-                
-                var ang = theta
-                
-                var a2 = (((ang+9)%360)+360)%360
-                
+                ///
+                /// Update car sprite
+                ///
+                var a2 = (((theta+9)%360)+360)%360
                 var div_angle = Math.floor(a2/18)
-                
                 var index = angle_index[div_angle]
-                
-                //console.log(Math.floor((ang-9)/18))
-                //console.log(index)
                 selected.setSpriteIndex(index)
-    
                 
-                // collision
+                ///
+                /// Collision
+                ///
+                    /// CAR TO CAR
                 hash.clearObject();
                 
+                    /// CAR TO WALL
                 var wall_colide = wall_collision.getOverlappingActors(
-                                    r0.setBounds( selected.x + selected.width/2 + dx - 4, selected.y + selected.height/2 - 4 +dy, 8 , 8 ) 
+                                    r0.setBounds( 
+                                        selected.x + selected.width/2 + dx - 4, 
+                                        selected.y + selected.height/2 - 4 +dy, 
+                                        8 , 8 ) 
                                     );
-                                    
+                               
+                /// HANDLE WALL COLLISION     
                 if (wall_colide.length) {
                     v = v*0.8;
                     
+                    var moveAwayX = 5*Math.cos((theta+180) * Math.PI / 180)
+                    var moveAwayY = 5*Math.sin((theta+180) * Math.PI / 180)
                     
-                    var dcX = 5 * Math.cos((theta+180) * Math.PI / 180)
-                    var dcY = 5 * Math.sin((theta+180) * Math.PI / 180)
+                    var dcX = 0
+                    var dcY = 0
                     
-                    // TODO verify that the new position isn't in a collided state
-                    
-                    selected.x += dcX
-                    selected.y += dcY
+                    selected.x += moveAwayX+dcX
+                    selected.y += moveAwayY+dcY
                     
                 } else {
+                    /// NO COLLISION
                     selected.x += dx
                     selected.y += dy
                 }
-    
-                if ( selected.x > director.width-20 ) {
-                    selected.x= director.width-20;
-                } else if ( selected.x<-20 ) {
-                    selected.x= -20;
-                }
-                if ( selected.y > director.height-20 ) {
-                    selected.y= director.height-20;
-                } else if ( selected.y<-20 ) {
-                    selected.y= -20;
-                }
             }
+            
             prevTime= ottime;
         },
         null
