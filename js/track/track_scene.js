@@ -1,5 +1,33 @@
+
+var collide_along_path = function(path,car) {
+    // find path car is colliding with
+    
+    // slow down car
+    
+    // move it along path in direction it was traveling
+        // adjust position
+        // adjust direction
+    
+    // return the new position of it moved along the path
+
+    return false;
+}
+
+var left = function(linea,lineb) {
+    // is b1 to the left of the line from a1 to a2?
+    return false
+}
+
+var intersect = function(linea,lineb) {
+    // do the two lines intersect?
+    return false
+}
+
 var track_scene = function(director, track_def, player_car) {    
     var scene = director.createScene();
+    
+    var player_car_checkpoint = 0;
+    // setup player_car initial position based on start line
     
     // create a black box actor container to hold our background scene
     var background = new CAAT.ActorContainer()
@@ -14,6 +42,8 @@ var track_scene = function(director, track_def, player_car) {
     /// build background
     var action_container = new CAAT.ActorContainer()
         .setBounds(0,0,director.width,director.height)
+    
+    action_container.addChild(player_car.actor);
     
     // create a foreground container
     var foreground = new CAAT.ActorContainer()
@@ -32,4 +62,69 @@ var track_scene = function(director, track_def, player_car) {
     scene.addChild(foreground);
     if(RACER.debug) 
         scene.addChild(debug)
+        
+    this.prevTime = -1;
+    scene.createTimer( scene.time, Number.MAX_VALUE, null,
+        function(time, ttime, timerTask) {
+            var ottime= ttime;
+            if ( -1!=prevTime ) {
+            
+                // do physics
+                player_car.physics(time,ttime,track_def)
+                
+                new_car_x = player_car.actor.x * player_car.velocity.x * (ttime/1000)
+                new_car_y = player_car.actor.y * player_car.velocity.y * (ttime/1000)
+                new_car_pos = {x:new_car_x, y:new_car_y}
+                
+                // do collision with wall paths
+                for( var i = 0; i < track_def.wall_paths.length; i++ ) {
+                    path = track_def.wall_paths[i]
+                    
+                    var collide = collide_along_path(path,car) 
+                    if (collide.x) {
+                        new_car_pos = collide
+                        break;
+                    }
+                }
+                
+                // do collision with dynamic_paths
+                for( var i = 0; i < track_def.dynamic_paths.length; i++ ) {
+                    path = track_def.dynamic_paths[i]
+                    
+                    var collide = collide_along_path(path,car) 
+                    if (collide.x) {
+                        new_car_pos = collide
+                        break;
+                    }
+                }
+                
+                // do obstacles,  if nothing obstacled it will return false
+                var obstacle = track_def.obstacles(time,player_car, player_car_checkpoint)
+                if (obstacles.x) {
+                     new_car_pos = obstacle
+                }
+                
+                // do checkpoints
+                var next_checkpoint_number =  (player_car_checkpoint+1)%track_def.check_points.length
+                var next_checkpoint = track_def.check_points[next_checkpoint_number]
+                var test_line = [player_car.actor.x, player_car.actor.y, new_car_x, new_car_y] 
+                
+                if( left(next_checkpoint, test_line) ) {
+                    if ( intersect(next_checkpoint,test_line ) ) {
+                        if(next_checkpoint_number == 0 ) {
+                            // OH SHIT NEW LAP
+                        }
+                    
+                        player_car_checkpoint = next_checkpoint_number;
+                    }
+                }
+                
+                player_car.x = new_car_x 
+                player_car.y = new_car_y
+                
+            }
+            prevTime= ottime;
+        }, 
+        null
+    );
 }
