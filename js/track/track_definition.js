@@ -9,22 +9,22 @@ var track_definition = function(director) {
     this.assets = [
         {id:'asset_name',  url:'location'}
     ]
-    
+
+    // array of the player cars
     this.cars = []
+
+    // array of features
+    this.features = []
 
     /// background
     /// image id
-    this.background_image_id = "" 
-    
-    this.background_actor = new CAAT.SpriteImage()
-                .initialize(director.getImage(this.background_image_id),1,1)
+    this.background_image_id = ""
+
     
     /// foreground
     /// image id
     this.foreground_image_id = ""
-    
-    this.foreground_actor = new CAAT.SpriteImage()
-                .initialize(director.getImage(this.foreground_image_id),1,1)
+
 
     // list of actors to add to scene for animations
     this.background_animations = []
@@ -34,46 +34,48 @@ var track_definition = function(director) {
     // list of paths
     this.wall_paths = []
     
-    // walls that are time dependant
+    // walls that are time dependant from the features
     this.dynamic_paths = function (t) {
-        
-        // called every frame
-        // should probably use the animations actors to build this
-        // so we can use their behaviors
-        
-        return []
+        return this.features.map(function( feature ) { return feature.dynamic_path(t) })
     }
     
     this.obstacles = function(time,car,check_point_progress) {
-        // called every frame to check for obstacles that are map dependant
-        // i.e. a pit, or a gap that needs to be jumped
-        // gives the current time (to sync with animations)
-        // also gives the car (this method is called for each car)
-        // and an int showing how far into check_points the car is
+        var result = false;
+
+        for( var f = 0; f < this.features.length ; f++) {
+            result = result || this.features[f].obstacle(time,car,check_point_progress)
+        }
+
+        return result
     }
     
     this.force_field = function(time,position) {
-        // this will be entirely based on features
-    
-        return {x:0,y:0}
+        var result = {x:0,y:0}
+        for( var f = 0; f < this.features.length ; f++) {
+            result.x += this.features[f].force_field(time,position).x
+            result.y += this.features[f].force_field(time,position).y
+        }
+        return result
     }
     
     this.get_wind = function(time,position) {
-        
+
+        var result = {x:0,y:0}
         // behind each car have wind "following" the car for a projection backwards by its direction for a distance proportional to it's velocity
-        
-        // also we can have features that produce wind
-            
-        return {x:0,y:0}
+        // TODO: the maths
+
+        for( var f = 0; f < this.features.length ; f++) {
+            result.x += this.features[f].get_wind(time,position).x
+            result.y += this.features[f].get_wind(time,position).y
+        }
+        return result
     }
     
     // starting line 
     // array of int coordinates [x1,y1,x2,y2]
     // cars will be evenly spaced along this line
+    // cars point left of x1->x2
     this.start_line = [0,0,0,0]
-    
-    // vector to point the cars
-    this.start_direction = [0,0]
 
     // checkpoint lines
     // array of array of [x1,y1,x2,y2]
@@ -82,4 +84,5 @@ var track_definition = function(director) {
     // the next checkpoint
     this.check_points = []
 
+    return this
 }
