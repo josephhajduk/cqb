@@ -79,63 +79,72 @@ var track_scene = function(director, track_def, player_car) {
     // controls
     registerCarControls(player_car)
 
+    var prevTime = -1
+
     scene.createTimer( scene.time, Number.MAX_VALUE, null,
         function(time, ttime, timerTask) {
-            // do physics
-            player_car.physics(time,ttime,track_def)
 
-            new_car_x = player_car.actor.x + player_car.velocity.x * (ttime/1000)
-            new_car_y = player_car.actor.y + player_car.velocity.y * (ttime/1000)
-            new_car_pos = {x:new_car_x, y:new_car_y}
+            var ottime= ttime;
+            if ( -1!=prevTime ) {
+                ttime-= prevTime;
+                // do physics
+                player_car.physics(time,ottime,track_def)
 
-            // do collision with wall paths
-            for( var i = 0; i < track_def.wall_paths.length; i++ ) {
-                path = track_def.wall_paths[i]
+                //console.log(ttime)
 
-                var collide = collide_along_path(path,car)
-                if (collide.x) {
-                    new_car_pos = collide
-                    break;
-                }
-            }
+                new_car_x = player_car.actor.x + player_car.velocity.x * (ttime/1000)
+                new_car_y = player_car.actor.y + player_car.velocity.y * (ttime/1000)
+                new_car_pos = {x:new_car_x, y:new_car_y}
 
-            // do collision with dynamic_paths
-            for( var i = 0; i < track_def.dynamic_paths.length; i++ ) {
-                path = track_def.dynamic_paths[i]
+                // do collision with wall paths
+                for( var i = 0; i < track_def.wall_paths.length; i++ ) {
+                    path = track_def.wall_paths[i]
 
-                var collide = collide_along_path(path,car)
-                if (collide.x) {
-                    new_car_pos = collide
-                    break;
-                }
-            }
-
-            // do obstacles,  if nothing obstacled it will return false
-            var obstacle = track_def.obstacles(time,player_car, player_car_checkpoint)
-            if (obstacle) {
-                 // obstacles can't trigger checkpoints
-                 return
-            }
-
-            // do checkpoints
-            var next_checkpoint_number =  (player_car_checkpoint+1)%track_def.check_points.length
-            var next_checkpoint = track_def.check_points[next_checkpoint_number]
-            var test_line = [player_car.actor.x, player_car.actor.y, new_car_x, new_car_y]
-
-            if( left(next_checkpoint, test_line) ) {
-                if ( intersect(next_checkpoint,test_line ) ) {
-                    if(next_checkpoint_number == 0 ) {
-                        // OH SHIT NEW LAP
+                    var collide = collide_along_path(path,car)
+                    if (collide.x) {
+                        new_car_pos = collide
+                        break;
                     }
-
-                    player_car_checkpoint = next_checkpoint_number;
                 }
+
+                // do collision with dynamic_paths
+                for( var i = 0; i < track_def.dynamic_paths.length; i++ ) {
+                    path = track_def.dynamic_paths[i]
+
+                    var collide = collide_along_path(path,car)
+                    if (collide.x) {
+                        new_car_pos = collide
+                        break;
+                    }
+                }
+
+                // do obstacles,  if nothing obstacled it will return false
+                var obstacle = track_def.obstacles(time,player_car, player_car_checkpoint)
+                if (obstacle) {
+                     // obstacles can't trigger checkpoints
+                     return
+                }
+
+                // do checkpoints
+                var next_checkpoint_number =  (player_car_checkpoint+1)%track_def.check_points.length
+                var next_checkpoint = track_def.check_points[next_checkpoint_number]
+                var test_line = [player_car.actor.x, player_car.actor.y, new_car_x, new_car_y]
+
+                if( left(next_checkpoint, test_line) ) {
+                    if ( intersect(next_checkpoint,test_line ) ) {
+                        if(next_checkpoint_number == 0 ) {
+                            // OH SHIT NEW LAP
+                        }
+
+                        player_car_checkpoint = next_checkpoint_number;
+                    }
+                }
+
+                player_car.actor.x = new_car_x
+                player_car.actor.y = new_car_y
+                player_car.point_car(player_car.direction)
             }
-
-            player_car.actor.x = new_car_x
-            player_car.actor.y = new_car_y
-            player_car.point_car(player_car.direction)
-
+            prevTime = ottime;
         }, 
         null
     );

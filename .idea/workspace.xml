@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d4e5ada9-4fbe-4ff3-bc9a-f0d0b0d3469d" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/js/controls.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/js/old.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/js/test_track.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/js/track/feature.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/car/car.js" afterPath="$PROJECT_DIR$/js/car/car.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/main.js" afterPath="$PROJECT_DIR$/js/main.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/track/track_definition.js" afterPath="$PROJECT_DIR$/js/track/track_definition.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/track/track_scene.js" afterPath="$PROJECT_DIR$/js/track/track_scene.js" />
     </list>
     <ignored path="cqb.iws" />
@@ -82,7 +75,7 @@
           <file leaf-file-name="car.js" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/js/car/car.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="59" column="17" selection-start="1541" selection-end="1541" vertical-scroll-proportion="0.03950104">
+                <state line="112" column="25" selection-start="2947" selection-end="2947" vertical-scroll-proportion="0.6340956">
                   <folding />
                 </state>
               </provider>
@@ -100,7 +93,7 @@
           <file leaf-file-name="track_scene.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/js/track/track_scene.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="87" column="44" selection-start="2705" selection-end="2705" vertical-scroll-proportion="-14.923077">
+                <state line="92" column="18" selection-start="2729" selection-end="2729" vertical-scroll-proportion="-13.230769">
                   <folding />
                 </state>
               </provider>
@@ -140,7 +133,7 @@
           <file leaf-file-name="old.js" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/js/old.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="267" column="78" selection-start="6968" selection-end="6968" vertical-scroll-proportion="0.4975418">
+                <state line="254" column="34" selection-start="6594" selection-end="6659" vertical-scroll-proportion="0.21632251">
                   <folding />
                 </state>
               </provider>
@@ -176,8 +169,8 @@
         <option value="$PROJECT_DIR$/js/track/feature.js" />
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/js/main.js" />
-        <option value="$PROJECT_DIR$/js/track/track_scene.js" />
         <option value="$PROJECT_DIR$/js/controls.js" />
+        <option value="$PROJECT_DIR$/js/track/track_scene.js" />
         <option value="$PROJECT_DIR$/js/car/car.js" />
       </list>
     </option>
@@ -393,7 +386,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="4" y="22" width="1916" height="1178" extended-state="7" />
+    <frame x="4" y="22" width="1916" height="1178" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -508,20 +501,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/track/track_scene.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="87" column="44" selection-start="2705" selection-end="2705" vertical-scroll-proportion="-14.923077">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/js/old.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="267" column="78" selection-start="6968" selection-end="6968" vertical-scroll-proportion="0.4975418">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/controls.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="8" column="34" selection-start="412" selection-end="412" vertical-scroll-proportion="0.0">
@@ -529,9 +508,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/js/old.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="254" column="34" selection-start="6594" selection-end="6659" vertical-scroll-proportion="0.21632251">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/track/track_scene.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="92" column="18" selection-start="2729" selection-end="2729" vertical-scroll-proportion="-13.230769">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/js/car/car.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="59" column="17" selection-start="1541" selection-end="1541" vertical-scroll-proportion="0.03950104">
+        <state line="112" column="25" selection-start="2947" selection-end="2947" vertical-scroll-proportion="0.6340956">
           <folding />
         </state>
       </provider>

@@ -53,39 +53,70 @@ var car = function(director,color) {
     }
     
     this.prevTime = -1;
-    
-    this.stats = {
-        engine_force: function(speed){return (1/(speed+1))/10},
-        aerodynamics: function(car_direction,velocity,wind) { return 1 },
-        breaks: 5,
-        tires: function(car_direction,force,velocity,mass,engine){
 
+    this.deltaA = function(car_direction,force,velocity,mass,engine) {
             var ax = engine.x * car_direction.x
             var ay = engine.y * car_direction.y
 
-            var slowdown = 1.2
+            var fx = force.x
+            var fy = force.y
 
-            var wx = slowdown * -1 * velocity.x
-            var wy = slowdown * -1 * velocity.y
+            return {x:ax+fx,y:ay+fy}
+    }
 
-            var fx = force.x + wx;
-            var fy = force.y + wy;
+    this.deltaV = function(a,car_direction,velocity,traction,time,break_pedal) {
 
-            if(Math.abs(velocity.x) > 0.01 || Math.abs(velocity.y) > 0.01) {
-                var tiref = 1;
+        var v_x = velocity.x
+        var v_y = velocity.y
+        var v_abs = Math.sqrt(v_x*v_x+v_y*v_y)
 
-                var cv = project_vec(car_direction,velocity)
+        //console.log(time)
 
-                var perpcd = {x: car_direction.x-cv.x,y: car_direction.y-cv.y}
+        // accelerate the car
+        var d_x = a.x * time
+        var d_y = a.y * time
 
-                var tx = tiref * perpcd.x
-                var ty = tiref * perpcd.y
+        var t_x = 0
+        var t_y = 0
 
-                return {x:ax+fx+tx,y:ay+fy+ty}
-            } else {
-                return {x:ax+fx,y:ay+fy}
-            }
+        if(v_abs != 0) {
+            // break the car
+            // should depend on mass (100-1000)
+            // and breaks (100 - 1000)
+            t_x -= velocity.x * 0.1 *(0.02+break_pedal)
+            t_y -= velocity.y * 0.1 *(0.02+break_pedal)
+
+            // turn the car
+            // traction is 0-1
+            // tires are 100-1000
+            // mass is 100-1000
+
+            // certain amount of v will remain in it's direction
+            skid = Math.max(v_abs - 4,0)    // 0.02 determines at what speed we will skid
+
+            //console.log("SKID:"+skid)
+
+            var s_x = skid/v_abs*v_x
+            var s_y = skid/v_abs*v_y
+
+            // rest gets turned
+            t_x += (v_abs-skid)*car_direction.x + s_x
+            t_y += (v_abs-skid)*car_direction.y + s_y
+        }
+
+        return {x:d_x+t_x-v_x,y:d_y+t_y-v_y}
+    }
+
+    this.stats = {
+        engine_force: function(speed){
+            if(speed < 100)
+                return 80//1000*(1/(speed+1))
+            else
+                return 0
         },
+        aerodynamics: function(car_direction,velocity,wind) { return 0 },
+        breaks: 100,
+        tires: 100,
         mass: 100
     }
 
@@ -95,11 +126,11 @@ var car = function(director,color) {
     this.physics = function(time,ttime,track_def) {
         var ottime= ttime;
         if ( -1!=this.prevTime ) {
+            ttime-= this.prevTime;
 
             // do steering control
             this.direction += this.steer_right*4.5 - this.steer_left*4.5
 
-            ttime-= this.prevTime;
             var seconds = (ttime/1000)
             
             var car_direction = {
@@ -124,9 +155,6 @@ var car = function(director,color) {
             var engine_y = this.throttle * this.stats.engine_force(v_abs)
             var engine = {x:engine_x,y:engine_y}
 
-            var bx = this.break_pedal * this.stats.breaks * -1 * this.velocity.x
-            var by = this.break_pedal * this.stats.breaks * -1 * this.velocity.y
-
             // air resistance (in direction of travel)  ~ v^2
             f_x -= this.stats.aerodynamics(
                         this.direction,
@@ -144,15 +172,17 @@ var car = function(director,color) {
             f_x += track_def.force_field(ttime,position).x;
             f_y += track_def.force_field(ttime,position).y;
             
-            var force = {x:f_x+bx,y:f_y+by}
-                    
+            var force = {x:f_x,y:f_y}
+
+            var traction = 1
+
             // tire physics
-            a_x = this.stats.tires(car_direction,force,this.velocity,this.stats.mass,engine).x
-            a_y = this.stats.tires(car_direction,force,this.velocity,this.stats.mass,engine).y
-            
+            var a = this.deltaA(car_direction,force,this.velocity,this.stats.mass,engine)
+            var v = this.deltaV(a,car_direction,this.velocity,traction, (ttime/1000) , this.break_pedal )
+
             // physics !!
-            this.velocity.x += a_x * (ttime/1000)  
-            this.velocity.y += a_y * (ttime/1000)        
+            this.velocity.x += v.x
+            this.velocity.y += v.y
         }
         this.prevTime = ottime;
     }
